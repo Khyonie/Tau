@@ -1,0 +1,10 @@
+[project]
+name = "Tau"
+libraries = ["lib/"]
+
+[task]
+
+[task.main]
+source = "src/"
+output = ["target/{NAME}/{NAME}.jar"]
+input = []
