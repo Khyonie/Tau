@@ -5,6 +5,7 @@ import java.util.Objects;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 
+import coffee.khyonieheart.tau.api.TauLogger;
 import coffee.khyonieheart.tau.api.gl.TauGLHandleOwner;
 import coffee.khyonieheart.tau.api.gl.TauGLShaderProgram;
 
@@ -16,10 +17,17 @@ public class TauBasicShader implements TauGLShaderProgram
 """
 #version 330 core
 layout (location = 0) in vec3 position;
+layout (location = 1) in vec2 texCoords;
+
+out vec2 oTexCoords;
+out vec2 xyPosition;
 
 void main()
 {
 	gl_Position = vec4(position.x, position.y, position.z, 1.0);
+	xyPosition = position.xy;
+
+	oTexCoords = texCoords;
 }
 """;
 
@@ -28,9 +36,14 @@ void main()
 #version 330 core
 out vec4 FragColor;
 
+in vec2 oTexCoords;
+in vec2 xyPosition;
+
+uniform sampler2D meshTexture;
+
 void main()
 {
-	FragColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	FragColor = vec4(xyPosition.x, xyPosition.y, 1.0, 1.0) / 2 + texture(meshTexture, oTexCoords);
 }
 """;
 
@@ -50,6 +63,8 @@ void main()
 	@Override
 	public void release(TauGLHandleOwner owner) 
 	{
+		owner.removeHandle(this);
+
 		GL20.glDeleteProgram(this.handle);
 	}
 
@@ -111,6 +126,6 @@ void main()
 		GL20.glDeleteShader(vertexShader);
 		GL20.glDeleteShader(fragmentShader);
 
-		System.out.println("Shader successfully compiled and linked with ID " + this.handle);
+		TauLogger.log(this, "Shader program successfully compiled and linked");
 	}
 }

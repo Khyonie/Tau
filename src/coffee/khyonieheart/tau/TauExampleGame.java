@@ -3,6 +3,7 @@ package coffee.khyonieheart.tau;
 import java.io.IOException;
 
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.opengl.GL11;
 
 import coffee.khyonieheart.tau.api.TauGameContainer;
 import coffee.khyonieheart.tau.api.TauMesh;
@@ -30,21 +31,31 @@ public class TauExampleGame extends TauGame
 			-0.5f, 0.5f, 1.0f
 		);
 
+		this.getRenderer().getTextureOptions().setWrapping(GL11.GL_REPEAT);
+		this.getRenderer().getTextureOptions().setTextureFiltering(GL11.GL_NEAREST);
+
 		mesh.allocate(container);
-		mesh.buffer();
 
 		try {
 			Texture tex = Texture.loadFromPNG("test.png");
+			tex.allocate(container);
+			tex.buffer();
 
-			tex.getImageData().rewind();
-			
-			while (tex.getImageData().position() < tex.getImageData().capacity())
-			{
-				System.out.println("[R" + tex.getImageData().get() + ",G" + tex.getImageData().get() + ",B" + tex.getImageData().get() + ",A" + tex.getImageData().get() + "]");
-			}
+			mesh.setTexture(tex, 
+				1.0f, 1.0f,
+				1.0f, -1.0f,
+				-1.0f, 1.0f,
+				1.0f, -1.0f,
+				-1.0f, -1.0f,
+				-1.0f, 1.0f
+			);
+
+			mesh.applyTexture();
 		} catch (IllegalArgumentException | IOException e) {
 			e.printStackTrace();
 		}
+
+		mesh.buffer();
 	}
 
 	@Override

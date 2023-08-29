@@ -60,6 +60,8 @@ public class TauGameContainer implements TauGLFWContextual, TauGLHandleOwner
 			GLFW.glfwSetWindowMonitor(this.handle, GLFW.glfwGetPrimaryMonitor(), 0, 0, this.width, this.height, GLFW.GLFW_DONT_CARE);
 		}
 
+		TauLogger.log(this, "Allocated");
+
 		return this.handle;
 	}
 
@@ -67,10 +69,14 @@ public class TauGameContainer implements TauGLFWContextual, TauGLHandleOwner
 	public void release(
 		TauGLHandleOwner owner
 	) {
-		for (TauGLHandled<?> h : ownedHandles)
+		TauLogger.log(this, "Releasing all owned handles");
+		for (TauGLHandled<?> h : new HashSet<>(ownedHandles))
 		{
+			TauLogger.log(this, "Releasing " + h.getClass().getSimpleName() + " #" + h.getHandle());
 			h.release(this);
 		}
+
+		TauLogger.log(this, "Released all handles");
 
 		this.handle = Long.MIN_VALUE;
 	}
@@ -86,6 +92,8 @@ public class TauGameContainer implements TauGLFWContextual, TauGLHandleOwner
 	{
 		Objects.requireNonNull(handle);
 
+		TauLogger.log(handle, "Registered to owner " + this.handle);
+
 		this.ownedHandles.add(handle);
 	}
 
@@ -93,6 +101,8 @@ public class TauGameContainer implements TauGLFWContextual, TauGLHandleOwner
 	public void removeHandle(TauGLHandled<?> handle) 
 	{
 		Objects.requireNonNull(handle);
+
+		TauLogger.log(handle, "Removed from owner " + this.handle);
 
 		this.ownedHandles.remove(handle);
 	}
@@ -107,6 +117,8 @@ public class TauGameContainer implements TauGLFWContextual, TauGLHandleOwner
 		GLFW.glfwSwapInterval(1);
 
 		this.isRunning = true;
+
+		TauLogger.log(this, "Context acquired");
 	}
 
 	@Override
@@ -114,6 +126,8 @@ public class TauGameContainer implements TauGLFWContextual, TauGLHandleOwner
 	{
 		GLFW.glfwSetWindowShouldClose(this.getHandle(), true);
 		GLFW.glfwDestroyWindow(this.getHandle());
+
+		TauLogger.log(this, "Context destroyed");
 
 		release(null);
 		this.isRunning = false;

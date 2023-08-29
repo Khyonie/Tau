@@ -62,8 +62,15 @@ public abstract class TauGame
 		}
 	}
 
+	@NotNull
 	public TauGLRenderer getRenderer()
 	{
 		return this.renderer;
+	}
+
+	@NotNull
+	public TauGameContainer getContainer()
+	{
+		return this.container;
 	}
 }

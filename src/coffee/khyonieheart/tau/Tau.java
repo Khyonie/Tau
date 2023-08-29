@@ -1,5 +1,8 @@
 package coffee.khyonieheart.tau;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /*
 Tau, a simple mixed 2D/3D OpenGL game library.
 Copyright (C) 2023 http://khyonieheart.coffee
@@ -21,10 +24,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 
+import coffee.khyonieheart.annotation.NotNull;
+import coffee.khyonieheart.annotation.Nullable;
 import coffee.khyonieheart.tau.api.TauGameContainer;
 
 public class Tau
 {
+	private static Map<Thread, TauGame> activeGames = new HashMap<>();
+
 	public static void main(String[] args)
 	{
 		System.out.println("« Tau »");
@@ -50,10 +57,19 @@ public class Tau
 		TauGame game = new TauExampleGame(testContainer, new TauExampleRenderer());
 		game.start();
 
+		activeGames.put(Thread.currentThread(), game);
+
 		System.out.println("Window terminated.");
 
 		GLFW.glfwTerminate();
 
 		System.out.println("GLFW terminated.");
+	}
+
+	@Nullable
+	public static TauGame getContainer(
+		@NotNull Thread thread
+	) {
+		return activeGames.get(thread);
 	}
 }
